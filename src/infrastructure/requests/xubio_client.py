@@ -4,6 +4,7 @@ Path: src/infrastructure/requests/xubio_client.py
 import requests
 from requests.auth import HTTPBasicAuth
 from fastapi import HTTPException
+from typing import Optional
 
 from src.shared.logger import get_logger
 
@@ -70,3 +71,36 @@ class XubioClient:
             self.logger.exception("Fallo HTTP al obtener token de Xubio")
             self.logger.critical("Excepción crítica al obtener token: %s", e)
             raise HTTPException(status_code=502, detail=f"Fallo HTTP token Xubio: {e}") from e
+
+    def listar_clientes(self, updated_since: Optional[str] = None):
+        """
+        Lista clientes desde Xubio, opcionalmente filtrando por fecha de actualización.
+        """
+        self.logger.info("Listando clientes desde Xubio (updated_since=%s)", updated_since)
+        token_data = self.get_access_token()
+        access_token = token_data["access_token"]
+        # Usa el path de configuración si existe
+        path = self.cfg.get("XUBIO_CLIENTS_PATH", "/1.1/contacts")
+        url = self.build_url(path)
+        params = {}
+        if updated_since:
+            params["updated_since"] = updated_since
+        try:
+            resp = requests.get(
+                url,
+                headers={
+                    "Authorization": f"Bearer {access_token}",
+                    "Accept": "application/json",
+                },
+                params=params,
+                timeout=self.cfg["XUBIO_TIMEOUT_S"],
+                verify=self.cfg["XUBIO_VERIFY_TLS"],
+            )
+            self.logger.info("Respuesta de clientes recibida: status %s", resp.status_code)
+            if resp.status_code >= 400:
+                self.logger.error("Error al listar clientes %s: %s", resp.status_code, resp.text)
+                raise HTTPException(status_code=resp.status_code, detail="Error al listar clientes de Xubio")
+            return resp.json()
+        except requests.RequestException as e:
+            self.logger.exception("Fallo HTTP al listar clientes de Xubio")
+            raise HTTPException(status_code=502, detail=f"Fallo HTTP listar clientes Xubio: {e}") from e
