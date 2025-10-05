@@ -6,9 +6,8 @@ from typing import Optional, Any
 
 from src.infrastructure.requests.xubio_client import XubioClient
 from src.use_cases.listar_clientes import XubioGateway
-from src.use_cases.listar_productos_venta import XubioProductoVentaGateway
 
-class XubioGatewayImpl(XubioGateway, XubioProductoVentaGateway):
+class XubioGatewayImpl(XubioGateway):
     """
     Implementación del gateway de Xubio usando XubioClient.
     Permite desacoplar la infraestructura de los casos de uso.
@@ -18,6 +17,3 @@ class XubioGatewayImpl(XubioGateway, XubioProductoVentaGateway):
 
     def listar_clientes(self, updated_since: Optional[str] = None) -> Any:
         return self.client.listar_clientes(updated_since)
-
-    def listar_productos_venta(self, updated_since: Optional[str] = None) -> Any:
-        return self.client.listar_productos_venta(updated_since)
