@@ -1,5 +1,5 @@
 """
-Entidad Cliente para el dominio.
+Path: src/entities/cliente.py
 """
 
 from typing import Optional

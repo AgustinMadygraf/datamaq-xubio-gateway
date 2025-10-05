@@ -7,10 +7,6 @@ import requests
 from requests.auth import HTTPBasicAuth
 from fastapi import HTTPException
 
-from src.shared.logger import get_logger
-
-logger = get_logger("xubio-client")
-
 class XubioClient:
     "Cliente para interactuar con la API de Xubio"
     def __init__(self, cfg: dict, client_logger):

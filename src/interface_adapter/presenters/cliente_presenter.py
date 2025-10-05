@@ -2,9 +2,10 @@
 Presentador para la entidad Cliente.
 """
 
-from src.domain.cliente import Cliente
+from src.entities.cliente import Cliente
 
 class ClientePresenter:
+    "Presentador para la entidad Cliente"
     @staticmethod
     def to_dict(cliente: Cliente) -> dict:
         return {
@@ -17,4 +18,5 @@ class ClientePresenter:
 
     @staticmethod
     def list_to_dict(clientes: list[Cliente]) -> list[dict]:
+        "Convierte una lista de objetos Cliente a una lista de diccionarios"
         return [ClientePresenter.to_dict(c) for c in clientes]
