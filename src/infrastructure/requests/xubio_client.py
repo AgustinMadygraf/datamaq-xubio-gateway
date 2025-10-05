@@ -105,3 +105,39 @@ class XubioClient:
         except requests.RequestException as e:
             self.logger.exception("Fallo HTTP al listar clientes de Xubio")
             raise HTTPException(status_code=502, detail=f"Fallo HTTP listar clientes Xubio: {e}") from e
+
+    def listar_productos_venta(self, updated_since: Optional[str] = None):
+        """
+        Lista productos de venta desde Xubio, opcionalmente filtrando por fecha de actualización.
+        """
+        self.logger.info("Listando productos de venta desde Xubio (updated_since=%s)", updated_since)
+        token_data = self.get_access_token()
+        access_token = token_data["access_token"]
+        path = self.cfg.get("XUBIO_PRODUCTOS_VENTA_PATH", "/1.1/sale-items")
+        url = self.build_url(path)
+        params = {}
+        if updated_since:
+            params["updated_since"] = updated_since
+        try:
+            resp = requests.get(
+                url,
+                headers={
+                    "Authorization": f"Bearer {access_token}",
+                    "Accept": "application/json",
+                },
+                params=params,
+                timeout=self.cfg["XUBIO_TIMEOUT_S"],
+                verify=self.cfg["XUBIO_VERIFY_TLS"],
+            )
+            self.logger.info("Respuesta de productos de venta recibida: status %s", resp.status_code)
+            if resp.status_code >= 400:
+                self.logger.error("Error al listar productos de venta %s: %s", resp.status_code, resp.text)
+                # Agrega el cuerpo de la respuesta para depuración
+                raise HTTPException(
+                    status_code=resp.status_code,
+                    detail=f"Error al listar productos de venta de Xubio: {resp.text}"
+                )
+            return resp.json()
+        except requests.RequestException as e:
+            self.logger.exception("Fallo HTTP al listar productos de venta de Xubio")
+            raise HTTPException(status_code=502, detail=f"Fallo HTTP listar productos de venta Xubio: {e}") from e
