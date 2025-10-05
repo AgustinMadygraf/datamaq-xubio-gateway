@@ -1,10 +1,11 @@
 """
 Path: src/infrastructure/requests/xubio_client.py
 """
+
+from typing import Optional
 import requests
 from requests.auth import HTTPBasicAuth
 from fastapi import HTTPException
-from typing import Optional
 
 from src.shared.logger import get_logger
 

@@ -11,6 +11,7 @@ from src.shared.config import get_config
 from src.shared.logger import get_logger
 
 from src.infrastructure.requests.xubio_client import XubioClient
+from src.interface_adapter.gateways.xubio_gateway import XubioGatewayImpl
 from src.use_cases.listar_clientes import ListarClientesUseCase
 
 router = APIRouter(prefix="", tags=["xubio"])
@@ -55,7 +56,8 @@ def listar_clientes(updated_since: Optional[str] = Query(default=None, descripti
     cfg = get_config()
     try:
         client = XubioClient(cfg, logger)
-        use_case = ListarClientesUseCase(client)
+        gateway = XubioGatewayImpl(client)
+        use_case = ListarClientesUseCase(gateway)
         result = use_case.execute(updated_since)
         return result
     except Exception as e:
