@@ -12,6 +12,7 @@ from src.shared.logger import get_logger
 
 from src.infrastructure.requests.xubio_client import XubioClient
 from src.interface_adapter.gateways.xubio_gateway import XubioGatewayImpl
+from src.interface_adapter.presenters.cliente_presenter import ClientePresenter
 from src.use_cases.listar_clientes import ListarClientesUseCase
 
 router = APIRouter(prefix="", tags=["xubio"])
@@ -60,7 +61,8 @@ def listar_clientes(updated_since: Optional[str] = Query(default=None, descripti
         gateway = XubioGatewayImpl(client)
         use_case = ListarClientesUseCase(gateway)
         result = use_case.execute(updated_since)
-        return result
+        # Usar el presentador para serializar la salida
+        return ClientePresenter.list_to_dict(result)
     except Exception as e:
         logger.critical("Error inesperado en listar_clientes: %s", e)
         raise HTTPException(status_code=500, detail="Error inesperado en listar_clientes") from e
