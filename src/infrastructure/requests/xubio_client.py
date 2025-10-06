@@ -7,11 +7,13 @@ import requests
 from requests.auth import HTTPBasicAuth
 from fastapi import HTTPException
 
+
 from src.interface_adapter.gateways.xubio_gateway import XubioGateway
 from src.entities.cliente_bean_entitie import ClienteGateway, Cliente
+from src.entities.token_gateway import TokenGateway
 
-class XubioClient(ClienteGateway):
-    "Cliente para interactuar con la API de Xubio implementando ClienteGateway"
+class XubioClient(ClienteGateway, TokenGateway):
+    "Cliente para interactuar con la API de Xubio implementando ClienteGateway y TokenGateway"
     def __init__(self, cfg: dict, client_logger):
         self.cfg = cfg
         self.logger = client_logger
