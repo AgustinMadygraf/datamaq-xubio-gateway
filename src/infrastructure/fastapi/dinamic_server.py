@@ -10,31 +10,15 @@ from fastapi import APIRouter, HTTPException, Query
 from src.shared.config import get_config
 from src.shared.logger import get_logger
 
-from src.infrastructure.requests.xubio_client import XubioClient
-from src.interface_adapter.gateways.xubio_gateway import XubioGateway
+from src.infrastructure.requests.xubio_client import XubioClient, SimpleXubioGateway
 from src.interface_adapter.controllers.cliente_bean_controller import ClienteBeanController
+#from src.interface_adapter.controllers.obtener_token_controller import ObtenerTokenController
 
 router = APIRouter(prefix="", tags=["xubio"])
 logger = get_logger("xubio-adapter")
 
 logger.info("Inicializando el router de Xubio Adapter")
 logger.debug("Configuración inicial del router: prefix='', tags=['xubio']")
-
-
-# Subclase concreta de XubioGateway que delega en XubioClient
-class SimpleXubioGateway(XubioGateway):
-    "Implementación simple de XubioGateway usando XubioClient"
-    def __init__(self, cfg, log):
-        super().__init__()
-        self._client = XubioClient(cfg, log)
-
-    def get_cliente(self, updated_since: Optional[str] = None):
-        " Lista clientes desde Xubio, opcionalmente filtrando por fecha de actualización"
-        return self._client.get_cliente(updated_since)
-    
-    def get_cliente_by_id(self, cliente_id: str):
-        "Obtiene un cliente por su ID usando XubioClient"
-        return self._client.get_cliente_by_id(cliente_id)
 
 @router.get("/api/xubio/clienteBean")
 def get_cliente(updated_since: Optional[str] = Query(default=None, description="ISO date (YYYY-MM-DD)")):
