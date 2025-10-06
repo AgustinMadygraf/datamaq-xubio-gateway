@@ -31,6 +31,10 @@ class SimpleXubioGateway(XubioGateway):
     def cliente_bean(self, updated_since: Optional[str] = None):
         " Lista clientes desde Xubio, opcionalmente filtrando por fecha de actualización"
         return self._client.cliente_bean(updated_since)
+    
+    def get_cliente_by_id(self, cliente_id: str):
+        "Obtiene un cliente por su ID usando XubioClient"
+        return self._client.get_cliente_by_id(cliente_id)
 
 @router.get("/api/xubio/clienteBean")
 def cliente_bean(updated_since: Optional[str] = Query(default=None, description="ISO date (YYYY-MM-DD)")):
@@ -40,6 +44,15 @@ def cliente_bean(updated_since: Optional[str] = Query(default=None, description=
     gateway = SimpleXubioGateway(cfg, logger)
     controller = ClienteBeanController(gateway)
     return controller.cliente_bean(updated_since)
+
+@router.get("/api/xubio/clienteBean/{cliente_id}")
+def get_cliente_by_id(cliente_id: str):
+    "Obtiene un cliente específico por ID desde Xubio"
+    logger.info("Endpoint /api/xubio/clienteBean/{cliente_id} llamado")
+    cfg = get_config()
+    gateway = SimpleXubioGateway(cfg, logger)
+    controller = ClienteBeanController(gateway)
+    return controller.get_cliente_by_id(cliente_id)
 
 @router.post("/api/xubio/token/test")
 @router.get("/api/xubio/token/test")

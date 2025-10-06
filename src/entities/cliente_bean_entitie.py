@@ -112,3 +112,7 @@ class ClienteGateway(Protocol):
     def cliente_bean(self, updated_since: Optional[str] = None) -> List[Cliente]:
         "Lista clientes desde el sistema"
         pass  # pylint: disable=unnecessary-pass
+
+    def get_cliente_by_id(self, cliente_id: str) -> Cliente:
+        "Obtiene un cliente por su ID"
+        pass # pylint: disable=unnecessary-pass

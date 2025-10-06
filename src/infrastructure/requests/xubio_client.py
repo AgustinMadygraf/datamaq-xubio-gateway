@@ -137,3 +137,33 @@ class XubioClient(ClienteGateway):
         except requests.RequestException as e:
             self.logger.exception("Fallo HTTP al listar productos de venta de Xubio")
             raise HTTPException(status_code=502, detail=f"Fallo HTTP listar productos de venta Xubio: {e}") from e
+
+    def get_cliente_by_id(self, cliente_id: str):
+        "Obtiene un cliente específico por ID desde Xubio"
+        self.logger.info("Obteniendo cliente por ID desde Xubio: %s", cliente_id)
+        token_data = self.get_access_token()
+        access_token = token_data["access_token"]
+        path = self.cfg.get("XUBIO_CLIENTS_PATH", "/1.1/clienteBean")
+        url = self.build_url(f"{path}/{cliente_id}")
+        try:
+            resp = requests.get(
+                url,
+                headers={
+                    "Authorization": f"Bearer {access_token}",
+                    "Accept": "application/json",
+                },
+                timeout=self.cfg["XUBIO_TIMEOUT_S"],
+                verify=self.cfg["XUBIO_VERIFY_TLS"],
+            )
+            self.logger.info("Respuesta de cliente por ID recibida: status %s", resp.status_code)
+            if resp.status_code == 404:
+                self.logger.warning("Cliente no encontrado: %s", cliente_id)
+                raise HTTPException(status_code=404, detail="Cliente no encontrado")
+            if resp.status_code >= 400:
+                self.logger.error("Error al obtener cliente %s: %s", resp.status_code, resp.text)
+                raise HTTPException(status_code=resp.status_code, detail="Error al obtener cliente de Xubio")
+            data = resp.json()
+            return Cliente.from_dict(data)
+        except requests.RequestException as e:
+            self.logger.exception("Fallo HTTP al obtener cliente de Xubio")
+            raise HTTPException(status_code=502, detail=f"Fallo HTTP obtener cliente Xubio: {e}") from e

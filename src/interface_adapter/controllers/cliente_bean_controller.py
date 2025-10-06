@@ -9,6 +9,7 @@ from src.shared.logger import get_logger
 
 from src.interface_adapter.presenters.cliente_bean_presenter import ClientePresenter
 from src.use_cases.cliente_bean_use_case import ListarClientesUseCase
+from src.use_cases.get_cliente_by_id_use_case import GetClienteByIdUseCase
 from src.entities.cliente_bean_entitie import ClienteGateway
 
 logger = get_logger("cliente-controller")
@@ -30,3 +31,14 @@ class ClienteBeanController:
         except Exception as e:
             self.logger.critical("Error inesperado en cliente_bean (POO): %s", e)
             raise HTTPException(status_code=500, detail="Error inesperado en cliente_bean_controller") from e
+
+    def get_cliente_by_id(self, cliente_id: str):
+        "Orquesta la obtención de un cliente por ID"
+        self.logger.info("Controller: get_cliente_by_id llamado")
+        try:
+            use_case = GetClienteByIdUseCase(self.gateway)
+            cliente = use_case.execute(cliente_id)
+            return ClientePresenter.to_dict(cliente)
+        except Exception as e:
+            self.logger.critical("Error inesperado en get_cliente_by_id: %s", e)
+            raise HTTPException(status_code=500, detail="Error inesperado en get_cliente_by_id") from e
