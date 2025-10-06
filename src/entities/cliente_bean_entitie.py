@@ -109,7 +109,7 @@ class Cliente:
 
 class ClienteGateway(Protocol):
     " Puerto que define las operaciones para interactuar con clientes"
-    def cliente_bean(self, updated_since: Optional[str] = None) -> List[Cliente]:
+    def get_cliente(self, updated_since: Optional[str] = None) -> List[Cliente]:
         "Lista clientes desde el sistema"
         pass  # pylint: disable=unnecessary-pass
 

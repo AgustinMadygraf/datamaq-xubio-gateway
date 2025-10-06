@@ -72,7 +72,7 @@ class XubioClient(ClienteGateway):
             self.logger.critical("Excepción crítica al obtener token: %s", e)
             raise HTTPException(status_code=502, detail=f"Fallo HTTP token Xubio: {e}") from e
 
-    def cliente_bean(self, updated_since: Optional[str] = None):
+    def get_cliente(self, updated_since: Optional[str] = None):
         " Alias para cliente_bean"
         self.logger.info("Listando clientes desde Xubio (updated_since=%s)", updated_since)
         token_data = self.get_access_token()

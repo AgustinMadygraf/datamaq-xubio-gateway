@@ -13,4 +13,4 @@ class ListarClientesUseCase:
 
     def execute(self, updated_since: Optional[str] = None) -> List[Cliente]:
         "Lista clientes desde el gateway, opcionalmente filtrando por fecha de actualización"
-        return self.gateway.cliente_bean(updated_since)
+        return self.gateway.get_cliente(updated_since)

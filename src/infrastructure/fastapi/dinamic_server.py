@@ -28,22 +28,22 @@ class SimpleXubioGateway(XubioGateway):
         super().__init__()
         self._client = XubioClient(cfg, log)
 
-    def cliente_bean(self, updated_since: Optional[str] = None):
+    def get_cliente(self, updated_since: Optional[str] = None):
         " Lista clientes desde Xubio, opcionalmente filtrando por fecha de actualización"
-        return self._client.cliente_bean(updated_since)
+        return self._client.get_cliente(updated_since)
     
     def get_cliente_by_id(self, cliente_id: str):
         "Obtiene un cliente por su ID usando XubioClient"
         return self._client.get_cliente_by_id(cliente_id)
 
 @router.get("/api/xubio/clienteBean")
-def cliente_bean(updated_since: Optional[str] = Query(default=None, description="ISO date (YYYY-MM-DD)")):
+def get_cliente(updated_since: Optional[str] = Query(default=None, description="ISO date (YYYY-MM-DD)")):
     "Lista clientes desde Xubio, opcionalmente filtrando por fecha de actualización"
     logger.info("Endpoint /api/xubio/clienteBean llamado")
     cfg = get_config()
     gateway = SimpleXubioGateway(cfg, logger)
     controller = ClienteBeanController(gateway)
-    return controller.cliente_bean(updated_since)
+    return controller.get_cliente(updated_since)
 
 @router.get("/api/xubio/clienteBean/{cliente_id}")
 def get_cliente_by_id(cliente_id: str):

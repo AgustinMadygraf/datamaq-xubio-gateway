@@ -21,7 +21,7 @@ class ClienteBeanController:
         self.gateway = gateway
         self.logger = logger
 
-    def cliente_bean(self, updated_since: Optional[str] = None):
+    def get_cliente(self, updated_since: Optional[str] = None):
         "Orquesta la obtención de clientes desde el gateway inyectado."
         self.logger.info("Controller: cliente_bean (POO) llamado")
         try:
