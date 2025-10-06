@@ -1,11 +1,10 @@
 """
-Path: src/use_cases/listar_clientes.py
+Path: src/use_cases/cliente_bean_use_case.py
 """
 
 from typing import Optional, List
 
-from src.entities.cliente import Cliente
-from src.entities.cliente import ClienteGateway
+from src.entities.cliente_bean_entitie import Cliente, ClienteGateway
 
 class ListarClientesUseCase:
     "Caso de uso para listar clientes desde un gateway (desacoplado de infraestructura)"
@@ -14,4 +13,4 @@ class ListarClientesUseCase:
 
     def execute(self, updated_since: Optional[str] = None) -> List[Cliente]:
         "Lista clientes desde el gateway, opcionalmente filtrando por fecha de actualización"
-        return self.gateway.listar_clientes(updated_since)
+        return self.gateway.cliente_bean(updated_since)

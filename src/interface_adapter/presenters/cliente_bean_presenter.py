@@ -1,8 +1,8 @@
 """
-Path: src/interface_adapter/presenters/cliente_presenter.py
+Path: src/interface_adapter/presenters/cliente_bean_presenter.py
 """
 
-from src.entities.cliente import Cliente
+from src.entities.cliente_bean_entitie import Cliente
 
 class ClientePresenter:
     "Presentador para la entidad Cliente"

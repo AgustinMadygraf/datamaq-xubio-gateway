@@ -12,7 +12,7 @@ from src.shared.logger import get_logger
 
 from src.infrastructure.requests.xubio_client import XubioClient
 from src.interface_adapter.gateways.xubio_gateway import XubioGateway
-from src.interface_adapter.controllers.cliente_controller import ClienteController
+from src.interface_adapter.controllers.cliente_bean_controller import ClienteBeanController
 
 router = APIRouter(prefix="", tags=["xubio"])
 logger = get_logger("xubio-adapter")
@@ -27,17 +27,19 @@ class SimpleXubioGateway(XubioGateway):
     def __init__(self, cfg, log):
         super().__init__()
         self._client = XubioClient(cfg, log)
-    def listar_clientes(self, updated_since: Optional[str] = None):
-        return self._client.listar_clientes(updated_since)
+
+    def cliente_bean(self, updated_since: Optional[str] = None):
+        " Lista clientes desde Xubio, opcionalmente filtrando por fecha de actualización"
+        return self._client.cliente_bean(updated_since)
 
 @router.get("/api/xubio/clienteBean")
-def listar_clientes(updated_since: Optional[str] = Query(default=None, description="ISO date (YYYY-MM-DD)")):
+def cliente_bean(updated_since: Optional[str] = Query(default=None, description="ISO date (YYYY-MM-DD)")):
     "Lista clientes desde Xubio, opcionalmente filtrando por fecha de actualización"
     logger.info("Endpoint /api/xubio/clienteBean llamado")
     cfg = get_config()
     gateway = SimpleXubioGateway(cfg, logger)
-    controller = ClienteController(gateway)
-    return controller.listar_clientes(updated_since)
+    controller = ClienteBeanController(gateway)
+    return controller.cliente_bean(updated_since)
 
 @router.post("/api/xubio/token/test")
 @router.get("/api/xubio/token/test")

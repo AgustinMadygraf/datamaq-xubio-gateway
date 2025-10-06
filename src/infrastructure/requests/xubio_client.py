@@ -8,8 +8,7 @@ from requests.auth import HTTPBasicAuth
 from fastapi import HTTPException
 
 
-from src.entities.cliente import ClienteGateway
-from src.entities.cliente import Cliente
+from src.entities.cliente_bean_entitie import ClienteGateway, Cliente
 
 class XubioClient(ClienteGateway):
     "Cliente para interactuar con la API de Xubio implementando ClienteGateway"
@@ -73,11 +72,8 @@ class XubioClient(ClienteGateway):
             self.logger.critical("Excepción crítica al obtener token: %s", e)
             raise HTTPException(status_code=502, detail=f"Fallo HTTP token Xubio: {e}") from e
 
-    def listar_clientes(self, updated_since: Optional[str] = None):
-        """
-        Lista clientes desde Xubio, opcionalmente filtrando por fecha de actualización.
-        Devuelve una lista de instancias de Cliente.
-        """
+    def cliente_bean(self, updated_since: Optional[str] = None):
+        " Alias para cliente_bean"
         self.logger.info("Listando clientes desde Xubio (updated_since=%s)", updated_since)
         token_data = self.get_access_token()
         access_token = token_data["access_token"]
@@ -109,9 +105,7 @@ class XubioClient(ClienteGateway):
             raise HTTPException(status_code=502, detail=f"Fallo HTTP listar clientes Xubio: {e}") from e
 
     def listar_productos_venta(self, updated_since: Optional[str] = None):
-        """
-        Lista productos de venta desde Xubio, opcionalmente filtrando por fecha de actualización.
-        """
+        "Lista productos de venta desde Xubio, opcionalmente filtrando por fecha de actualización"
         self.logger.info("Listando productos de venta desde Xubio (updated_since=%s)", updated_since)
         token_data = self.get_access_token()
         access_token = token_data["access_token"]

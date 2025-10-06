@@ -1,5 +1,5 @@
 """
-Path: src/entities/cliente.py
+Path: src/entities/cliente_bean_entitie.py
 """
 
 from typing import Optional, List, Protocol
@@ -109,6 +109,6 @@ class Cliente:
 
 class ClienteGateway(Protocol):
     " Puerto que define las operaciones para interactuar con clientes"
-    def listar_clientes(self, updated_since: Optional[str] = None) -> List[Cliente]:
+    def cliente_bean(self, updated_since: Optional[str] = None) -> List[Cliente]:
         "Lista clientes desde el sistema"
         pass  # pylint: disable=unnecessary-pass
