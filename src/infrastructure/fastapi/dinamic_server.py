@@ -21,6 +21,16 @@ logger = get_logger("xubio-adapter")
 logger.info("Inicializando el router de Xubio Adapter")
 logger.debug("Configuración inicial del router: prefix='', tags=['xubio']")
 
+@router.post("/api/xubio/token/test")
+@router.get("/api/xubio/token/test")
+def token_test():
+    "Endpoint de prueba para obtener un token de Xubio"
+    logger.info("Endpoint /api/xubio/token/test llamado")
+    cfg = get_config()
+    token_gateway = XubioClient(cfg, logger)
+    controller = ObtenerTokenController(token_gateway, logger)
+    return controller.obtener_token()
+
 @router.get("/api/xubio/clienteBean")
 def get_cliente(updated_since: Optional[str] = Query(default=None, description="ISO date (YYYY-MM-DD)")):
     "Lista clientes desde Xubio, opcionalmente filtrando por fecha de actualización"
@@ -39,16 +49,6 @@ def get_cliente_by_id(cliente_id: str):
     controller = ClienteBeanController(gateway)
     return controller.get_cliente_by_id(cliente_id)
 
-@router.post("/api/xubio/token/test")
-@router.get("/api/xubio/token/test")
-def token_test():
-    "Endpoint de prueba para obtener un token de Xubio"
-    logger.info("Endpoint /api/xubio/token/test llamado")
-    cfg = get_config()
-    token_gateway = XubioClient(cfg, logger)
-    controller = ObtenerTokenController(token_gateway, logger)
-    return controller.obtener_token()
-
 @router.get("/api/xubio/productos-venta")
 def listar_productos_venta(updated_since: Optional[str] = Query(default=None, description="ISO date (YYYY-MM-DD)")):
     "Lista productos en venta desde Xubio, opcionalmente filtrando por fecha de actualización"
@@ -57,3 +57,12 @@ def listar_productos_venta(updated_since: Optional[str] = Query(default=None, de
     gateway = SimpleXubioGateway(cfg, logger)
     controller = ProductoVentaController(gateway)
     return controller.listar_productos_venta(updated_since)
+    
+@router.get("/api/xubio/productos-venta/{cliente_id}")
+def listar_productos_venta_by_id(cliente_id: str):
+    "Lista productos en venta desde Xubio, opcionalmente filtrando por fecha de actualización"
+    logger.info("Endpoint /api/xubio/productos-venta/{cliente_id} llamado")
+    cfg = get_config()
+    gateway = SimpleXubioGateway(cfg, logger)
+    controller = ProductoVentaController(gateway)
+    return controller.listar_productos_venta_by_id(cliente_id)

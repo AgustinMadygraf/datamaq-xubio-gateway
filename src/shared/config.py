@@ -15,17 +15,16 @@ def get_config():
 
         # --- Xubio API ---
         # Base general del API y endpoints (token opcionalmente overrideable)
-        "XUBIO_BASE_URL": os.getenv('XUBIO_BASE_URL', 'https://main.xubio.com/API'),
-        "XUBIO_TOKEN_URL": os.getenv('XUBIO_TOKEN_URL'),  # si no se setea, se infiere desde BASE
+        "XUBIO_BASE_URL": os.getenv('XUBIO_BASE_URL'),
+        "XUBIO_TOKEN_URL": os.getenv('XUBIO_TOKEN_URL'),
         "XUBIO_CLIENT_ID": os.getenv('XUBIO_CLIENT_ID'),
         "XUBIO_CLIENT_SECRET": os.getenv('XUBIO_CLIENT_SECRET'),
-        "XUBIO_TIMEOUT_S": int(os.getenv('XUBIO_TIMEOUT_S', '15')),
-        "XUBIO_VERIFY_TLS": os.getenv('XUBIO_VERIFY_TLS', 'true').lower() == 'true',
+        "XUBIO_TIMEOUT_S": int(os.getenv('XUBIO_TIMEOUT_S')),
+        "XUBIO_VERIFY_TLS": os.getenv('XUBIO_VERIFY_TLS').lower() == 'true',
 
         # Endpoints de recursos (overrideables por .env si cambian paths)
-        "XUBIO_CLIENTS_PATH": os.getenv('XUBIO_CLIENTS_PATH', '1.1/clienteBean'),
-        "XUBIO_PRODUCTOS_VENTA_PATH": os.getenv('XUBIO_PRODUCTOS_VENTA_PATH', '1.1/ProductoVentaBean'),
-        # Agregás más paths cuando avances: productos, comprobantes, etc.
+        "XUBIO_CLIENTS_PATH": os.getenv('XUBIO_CLIENTS_PATH'),
+        "XUBIO_PRODUCTOS_VENTA_PATH": os.getenv('XUBIO_PRODUCTOS_VENTA_PATH'),
     }
     return config
 

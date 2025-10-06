@@ -1,5 +1,5 @@
 """
-Path: src/use_cases/cliente_bean_use_case.py
+Path: src/use_cases/get_cliente_use_case.py
 """
 
 from typing import Optional, List

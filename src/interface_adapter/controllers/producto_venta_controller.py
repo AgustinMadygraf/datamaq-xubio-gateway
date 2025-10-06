@@ -26,3 +26,15 @@ class ProductoVentaController:
         except Exception as e:
             self.logger.critical("Error inesperado en listar_productos_venta: %s", e)
             raise HTTPException(status_code=500, detail="Error inesperado en producto_venta_controller") from e
+
+    def listar_productos_venta_by_id(self, cliente_id: str):
+        "Controlador para listar productos de venta por ID de cliente"
+        self.logger.info("Controller: listar_productos_venta_by_id llamado")
+        try:
+            from src.use_cases.get_producto_venta_by_id_use_case import GetProductoVentaByIdUseCase
+            use_case = GetProductoVentaByIdUseCase(self.gateway)
+            result = use_case.execute(cliente_id)
+            return ProductoVentaPresenter.list_to_dict(result)
+        except Exception as e:
+            self.logger.critical("Error inesperado en listar_productos_venta_by_id: %s", e)
+            raise HTTPException(status_code=500, detail="Error inesperado en producto_venta_controller") from e

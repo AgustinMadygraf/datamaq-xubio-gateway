@@ -14,7 +14,17 @@ from src.entities.token_gateway import TokenGateway
 from src.entities.producto_venta_entitie import ProductoVenta, ProductoVentaGateway
 
 class XubioClient(ClienteGateway, TokenGateway, ProductoVentaGateway):
-    "Cliente para interactuar con la API de Xubio implementando ClienteGateway y TokenGateway"
+    "Cliente HTTP para interactuar con la API de Xubio"
+    def get_producto_venta_by_cliente_id(self, cliente_id: str):
+        "Obtiene productos de venta asociados a un cliente específico por ID desde Xubio (filtrado local)"
+        self.logger.info("Listando productos de venta por cliente_id desde Xubio (filtrado local): %s", cliente_id)
+        # Obtener todos los productos de venta
+        productos = self.get_producto_venta()
+        # Filtrar localmente por el campo que relacione producto y cliente
+        # Suponemos que el campo usrcode representa el cliente_id (ajustar si es otro campo)
+        filtrados = [p for p in productos if str(p.usrcode) == str(cliente_id)]
+        self.logger.info("Productos filtrados por cliente_id=%s: %d encontrados", cliente_id, len(filtrados))
+        return filtrados
     def __init__(self, cfg: dict, client_logger):
         self.cfg = cfg
         self.logger = client_logger
@@ -174,6 +184,9 @@ class XubioClient(ClienteGateway, TokenGateway, ProductoVentaGateway):
 
 class SimpleXubioGateway(XubioGateway):
     "Implementación simple de XubioGateway usando XubioClient"
+    def get_producto_venta_by_cliente_id(self, cliente_id: str):
+        "Obtiene productos de venta asociados a un cliente específico por ID desde Xubio"
+        return self._client.get_producto_venta_by_cliente_id(cliente_id)
     def __init__(self, cfg, log):
         super().__init__()
         self._client = XubioClient(cfg, log)

@@ -8,7 +8,7 @@ from fastapi import HTTPException
 from src.shared.logger import get_logger
 
 from src.interface_adapter.presenters.cliente_bean_presenter import ClientePresenter
-from src.use_cases.cliente_bean_use_case import ListarClientesUseCase
+from src.use_cases.get_cliente_use_case import ListarClientesUseCase
 from src.use_cases.get_cliente_by_id_use_case import GetClienteByIdUseCase
 from src.entities.cliente_bean_entitie import ClienteGateway
 

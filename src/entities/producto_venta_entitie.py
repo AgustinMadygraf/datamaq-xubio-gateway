@@ -72,6 +72,6 @@ class ProductoVentaGateway(Protocol):
         "Lista productos de venta desde Xubio, opcionalmente filtrando por fecha de actualización"
         pass # pylint: disable=unnecessary-pass
 
-    def get_producto_ventaby_id(self, productoid: int) -> ProductoVenta:
-        "Obtiene un producto de venta específico por ID desde Xubio"
+    def get_producto_venta_by_cliente_id(self, cliente_id: str) -> List[ProductoVenta]:
+        "Obtiene productos de venta asociados a un cliente específico por ID desde Xubio"
         pass # pylint: disable=unnecessary-pass
