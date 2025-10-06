@@ -11,8 +11,9 @@ from fastapi import HTTPException
 from src.interface_adapter.gateways.xubio_gateway import XubioGateway
 from src.entities.cliente_bean_entitie import ClienteGateway, Cliente
 from src.entities.token_gateway import TokenGateway
+from src.entities.producto_venta_entitie import ProductoVenta, ProductoVentaGateway
 
-class XubioClient(ClienteGateway, TokenGateway):
+class XubioClient(ClienteGateway, TokenGateway, ProductoVentaGateway):
     "Cliente para interactuar con la API de Xubio implementando ClienteGateway y TokenGateway"
     def __init__(self, cfg: dict, client_logger):
         self.cfg = cfg
@@ -136,12 +137,12 @@ class XubioClient(ClienteGateway, TokenGateway):
             self.logger.exception("Fallo HTTP al obtener cliente de Xubio")
             raise HTTPException(status_code=502, detail=f"Fallo HTTP obtener cliente Xubio: {e}") from e
 
-    def listar_productos_venta(self, updated_since: Optional[str] = None):
+    def get_producto_venta(self, updated_since: Optional[str] = None):
         "Lista productos de venta desde Xubio, opcionalmente filtrando por fecha de actualización"
         self.logger.info("Listando productos de venta desde Xubio (updated_since=%s)", updated_since)
         token_data = self.get_access_token()
         access_token = token_data["access_token"]
-        path = self.cfg.get("XUBIO_PRODUCTOS_VENTA_PATH", "/1.1/sale-items")
+        path = self.cfg.get("XUBIO_PRODUCTOS_VENTA_PATH", "/1.1/ProductoVentaBean")
         url = self.build_url(path)
         params = {}
         if updated_since:
@@ -160,12 +161,13 @@ class XubioClient(ClienteGateway, TokenGateway):
             self.logger.info("Respuesta de productos de venta recibida: status %s", resp.status_code)
             if resp.status_code >= 400:
                 self.logger.error("Error al listar productos de venta %s: %s", resp.status_code, resp.text)
-                # Agrega el cuerpo de la respuesta para depuración
                 raise HTTPException(
                     status_code=resp.status_code,
                     detail=f"Error al listar productos de venta de Xubio: {resp.text}"
                 )
-            return resp.json()
+            data = resp.json()
+            items = data.get("items") if isinstance(data, dict) and "items" in data else data
+            return [ProductoVenta.from_dict(item) for item in items]
         except requests.RequestException as e:
             self.logger.exception("Fallo HTTP al listar productos de venta de Xubio")
             raise HTTPException(status_code=502, detail=f"Fallo HTTP listar productos de venta Xubio: {e}") from e
@@ -183,3 +185,7 @@ class SimpleXubioGateway(XubioGateway):
     def get_cliente_by_id(self, cliente_id: str):
         "Obtiene un cliente por su ID usando XubioClient"
         return self._client.get_cliente_by_id(cliente_id)
+
+    def get_producto_venta(self, updated_since: Optional[str] = None):
+        "Lista productos de venta desde Xubio, opcionalmente filtrando por fecha de actualización"
+        return self._client.get_producto_venta(updated_since)

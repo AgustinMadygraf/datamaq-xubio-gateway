@@ -13,6 +13,7 @@ from src.infrastructure.requests.xubio_client import SimpleXubioGateway
 from src.interface_adapter.controllers.cliente_bean_controller import ClienteBeanController
 from src.interface_adapter.controllers.obtener_token_controller import ObtenerTokenController
 from src.infrastructure.requests.xubio_client import XubioClient
+from src.interface_adapter.controllers.producto_venta_controller import ProductoVentaController
 
 router = APIRouter(prefix="", tags=["xubio"])
 logger = get_logger("xubio-adapter")
@@ -47,3 +48,12 @@ def token_test():
     token_gateway = XubioClient(cfg, logger)
     controller = ObtenerTokenController(token_gateway, logger)
     return controller.obtener_token()
+
+@router.get("/api/xubio/productos-venta")
+def listar_productos_venta(updated_since: Optional[str] = Query(default=None, description="ISO date (YYYY-MM-DD)")):
+    "Lista productos en venta desde Xubio, opcionalmente filtrando por fecha de actualización"
+    logger.info("Endpoint /api/xubio/productos-venta llamado")
+    cfg = get_config()
+    gateway = SimpleXubioGateway(cfg, logger)
+    controller = ProductoVentaController(gateway)
+    return controller.listar_productos_venta(updated_since)

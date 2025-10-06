@@ -24,6 +24,7 @@ def get_config():
 
         # Endpoints de recursos (overrideables por .env si cambian paths)
         "XUBIO_CLIENTS_PATH": os.getenv('XUBIO_CLIENTS_PATH', '1.1/clienteBean'),
+        "XUBIO_PRODUCTOS_VENTA_PATH": os.getenv('XUBIO_PRODUCTOS_VENTA_PATH', '1.1/ProductoVentaBean'),
         # Agregás más paths cuando avances: productos, comprobantes, etc.
     }
     return config
