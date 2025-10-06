@@ -1,5 +1,6 @@
 """
-Path: src/interface_adapter/controllers/cliente_controller.py"""
+Path: src/interface_adapter/controllers/cliente_controller.py
+"""
 
 from typing import Optional
 from fastapi import HTTPException
@@ -14,14 +15,12 @@ from src.interface_adapter.presenters.cliente_presenter import ClientePresenter
 logger = get_logger("cliente-controller")
 
 def listar_clientes_controller(updated_since: Optional[str] = None):
-    """
-    Orquesta la obtención de clientes desde Xubio.
-    """
+    "Orquesta la obtención de clientes desde Xubio."
     logger.info("Controller: listar_clientes_controller llamado")
     cfg = get_config()
     try:
-        client = XubioClient(cfg, logger)
-        use_case = ListarClientesUseCase(client)
+        gateway: XubioClient = XubioClient(cfg, logger)
+        use_case = ListarClientesUseCase(gateway)
         result = use_case.execute(updated_since)
         return ClientePresenter.list_to_dict(result)
     except Exception as e:

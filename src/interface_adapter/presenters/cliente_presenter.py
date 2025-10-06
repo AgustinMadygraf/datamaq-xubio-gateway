@@ -1,5 +1,5 @@
 """
-Presentador para la entidad Cliente.
+Path: src/interface_adapter/presenters/cliente_presenter.py
 """
 
 from src.entities.cliente import Cliente
@@ -8,6 +8,7 @@ class ClientePresenter:
     "Presentador para la entidad Cliente"
     @staticmethod
     def to_dict(cliente: Cliente) -> dict:
+        "Convierte un objeto Cliente a un diccionario"
         return {
             "cliente_id": cliente.cliente_id,
             "nombre": cliente.nombre,
