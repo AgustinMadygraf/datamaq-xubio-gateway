@@ -5,21 +5,19 @@ Path: src/interface_adapter/controllers/cliente_controller.py
 from typing import Optional
 from fastapi import HTTPException
 
-from src.shared.config import get_config
 from src.shared.logger import get_logger
 
-from src.infrastructure.requests.xubio_client import XubioClient
-from src.use_cases.listar_clientes import ListarClientesUseCase
 from src.interface_adapter.presenters.cliente_presenter import ClientePresenter
+from src.use_cases.listar_clientes import ListarClientesUseCase
+from src.entities.cliente_gateway import ClienteGateway
 
 logger = get_logger("cliente-controller")
 
-def listar_clientes_controller(updated_since: Optional[str] = None):
-    "Orquesta la obtención de clientes desde Xubio."
+
+def listar_clientes_controller(gateway: ClienteGateway, updated_since: Optional[str] = None):
+    "Orquesta la obtención de clientes desde un gateway inyectado."
     logger.info("Controller: listar_clientes_controller llamado")
-    cfg = get_config()
     try:
-        gateway: XubioClient = XubioClient(cfg, logger)
         use_case = ListarClientesUseCase(gateway)
         result = use_case.execute(updated_since)
         return ClientePresenter.list_to_dict(result)

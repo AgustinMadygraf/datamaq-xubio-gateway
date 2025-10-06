@@ -23,7 +23,9 @@ logger.debug("Configuración inicial del router: prefix='', tags=['xubio']")
 def listar_clientes(updated_since: Optional[str] = Query(default=None, description="ISO date (YYYY-MM-DD)")):
     "Lista clientes desde Xubio, opcionalmente filtrando por fecha de actualización"
     logger.info("Endpoint /api/xubio/clientes llamado")
-    return listar_clientes_controller(updated_since)
+    cfg = get_config()
+    gateway = XubioClient(cfg, logger)
+    return listar_clientes_controller(gateway, updated_since)
 
 @router.post("/api/xubio/token/test")
 @router.get("/api/xubio/token/test")
