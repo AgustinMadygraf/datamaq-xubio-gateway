@@ -11,6 +11,7 @@ from src.shared.config import get_config
 from src.shared.logger import get_logger
 
 from src.infrastructure.requests.xubio_client import XubioClient
+from src.interface_adapter.gateways.xubio_gateway import XubioGateway
 from src.interface_adapter.controllers.cliente_controller import listar_clientes_controller
 
 router = APIRouter(prefix="", tags=["xubio"])
@@ -19,12 +20,22 @@ logger = get_logger("xubio-adapter")
 logger.info("Inicializando el router de Xubio Adapter")
 logger.debug("Configuración inicial del router: prefix='', tags=['xubio']")
 
+
+# Subclase concreta de XubioGateway que delega en XubioClient
+class SimpleXubioGateway(XubioGateway):
+    "Implementación simple de XubioGateway usando XubioClient"
+    def __init__(self, cfg, log):
+        super().__init__()
+        self._client = XubioClient(cfg, log)
+    def listar_clientes(self, updated_since: Optional[str] = None):
+        return self._client.listar_clientes(updated_since)
+
 @router.get("/api/xubio/clientes")
 def listar_clientes(updated_since: Optional[str] = Query(default=None, description="ISO date (YYYY-MM-DD)")):
     "Lista clientes desde Xubio, opcionalmente filtrando por fecha de actualización"
     logger.info("Endpoint /api/xubio/clientes llamado")
     cfg = get_config()
-    gateway = XubioClient(cfg, logger)
+    gateway = SimpleXubioGateway(cfg, logger)
     return listar_clientes_controller(gateway, updated_since)
 
 @router.post("/api/xubio/token/test")
