@@ -7,7 +7,9 @@ import requests
 from requests.auth import HTTPBasicAuth
 from fastapi import HTTPException
 
-from src.entities.cliente_gateway import ClienteGateway
+
+from src.entities.cliente import ClienteGateway
+from src.entities.cliente import Cliente
 
 class XubioClient(ClienteGateway):
     "Cliente para interactuar con la API de Xubio implementando ClienteGateway"
@@ -74,11 +76,11 @@ class XubioClient(ClienteGateway):
     def listar_clientes(self, updated_since: Optional[str] = None):
         """
         Lista clientes desde Xubio, opcionalmente filtrando por fecha de actualización.
+        Devuelve una lista de instancias de Cliente.
         """
         self.logger.info("Listando clientes desde Xubio (updated_since=%s)", updated_since)
         token_data = self.get_access_token()
         access_token = token_data["access_token"]
-        # Usa el path de configuración si existe
         path = self.cfg.get("XUBIO_CLIENTS_PATH", "/1.1/contacts")
         url = self.build_url(path)
         params = {}
@@ -99,7 +101,9 @@ class XubioClient(ClienteGateway):
             if resp.status_code >= 400:
                 self.logger.error("Error al listar clientes %s: %s", resp.status_code, resp.text)
                 raise HTTPException(status_code=resp.status_code, detail="Error al listar clientes de Xubio")
-            return resp.json()
+            data = resp.json()
+            items = data.get("items") if isinstance(data, dict) and "items" in data else data
+            return [Cliente.from_dict(item) for item in items]
         except requests.RequestException as e:
             self.logger.exception("Fallo HTTP al listar clientes de Xubio")
             raise HTTPException(status_code=502, detail=f"Fallo HTTP listar clientes Xubio: {e}") from e

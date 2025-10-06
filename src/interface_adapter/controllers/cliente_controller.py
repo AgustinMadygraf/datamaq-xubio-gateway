@@ -9,7 +9,7 @@ from src.shared.logger import get_logger
 
 from src.interface_adapter.presenters.cliente_presenter import ClientePresenter
 from src.use_cases.listar_clientes import ListarClientesUseCase
-from src.entities.cliente_gateway import ClienteGateway
+from src.entities.cliente import ClienteGateway
 
 logger = get_logger("cliente-controller")
 

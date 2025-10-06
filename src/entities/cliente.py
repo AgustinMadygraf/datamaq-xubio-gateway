@@ -2,7 +2,7 @@
 Path: src/entities/cliente.py
 """
 
-from typing import Optional
+from typing import Optional, List, Protocol
 
 class Cliente:
     " Entidad que representa un cliente en el dominio"
@@ -22,7 +22,10 @@ class Cliente:
 
     @classmethod
     def from_dict(cls, data: dict):
-        "Crea una instancia de Cliente desde un diccionario"
+        """
+        Crea una instancia de Cliente desde un diccionario.
+        Este método solo debe usarse en gateways para adaptar respuestas externas.
+        """
         return cls(
             cliente_id=str(data.get("id") or data.get("codigo") or ""),
             nombre=data.get("nombre") or data.get("name") or "",
@@ -30,3 +33,10 @@ class Cliente:
             telefono=data.get("telefono") or data.get("phone"),
             actualizado_en=data.get("updated_at") or data.get("actualizado_en"),
         )
+
+
+class ClienteGateway(Protocol):
+    " Puerto que define las operaciones para interactuar con clientes"
+    def listar_clientes(self, updated_since: Optional[str] = None) -> List[Cliente]:
+        "Lista clientes desde el sistema"
+        pass  # pylint: disable=unnecessary-pass
