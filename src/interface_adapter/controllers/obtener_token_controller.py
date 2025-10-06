@@ -23,7 +23,6 @@ class ObtenerTokenController:
             if not access:
                 self.logger.warning("No se obtuvo access_token en la respuesta")
             masked = access[:6] + "…" + access[-4:] if isinstance(access, str) and len(access) > 12 else "mask"
-            self.logger.debug("Token obtenido y enmascarado: %s", masked)
             return {
                 "ok": True,
                 "obtained_at_utc": now,

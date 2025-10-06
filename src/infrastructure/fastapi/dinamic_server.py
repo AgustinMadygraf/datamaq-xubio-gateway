@@ -19,7 +19,6 @@ router = APIRouter(prefix="", tags=["xubio"])
 logger = get_logger("xubio-adapter")
 
 logger.info("Inicializando el router de Xubio Adapter")
-logger.debug("Configuración inicial del router: prefix='', tags=['xubio']")
 
 @router.post("/api/xubio/token/test")
 @router.get("/api/xubio/token/test")

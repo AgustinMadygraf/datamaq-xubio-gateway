@@ -16,21 +16,65 @@ from src.entities.producto_venta_entitie import ProductoVenta, ProductoVentaGate
 class XubioClient(ClienteGateway, TokenGateway, ProductoVentaGateway):
     "Cliente HTTP para interactuar con la API de Xubio"
     def get_producto_venta_by_cliente_id(self, cliente_id: str):
-        "Obtiene productos de venta asociados a un cliente específico por ID desde Xubio (filtrado local)"
-        self.logger.info("Listando productos de venta por cliente_id desde Xubio (filtrado local): %s", cliente_id)
-        # Obtener todos los productos de venta
+        """
+        Obtiene productos de venta asociados a un cliente específico por ID desde Xubio.
+        Si el parámetro parece un productoid, filtra por ese campo.
+        """
+        self.logger.info("Obteniendo productos de venta para cliente_id: %s", cliente_id)
         productos = self.get_producto_venta()
-        # Filtrar localmente por el campo que relacione producto y cliente
-        # Suponemos que el campo usrcode representa el cliente_id (ajustar si es otro campo)
-        filtrados = [p for p in productos if str(p.usrcode) == str(cliente_id)]
-        self.logger.info("Productos filtrados por cliente_id=%s: %d encontrados", cliente_id, len(filtrados))
-        return filtrados
+        # Nuevo: filtrar por productoid si coincide exactamente
+        filtrados = [p for p in productos if str(getattr(p, "productoid", "")) == str(cliente_id)]
+        if filtrados:
+            self.logger.info("Producto encontrado por productoid=%s", cliente_id)
+            return filtrados
+        
+        # Si llegamos aquí, el endpoint directo no funcionó, continuamos con el método actual
+        self.logger.info("Listando productos de venta por cliente_id desde Xubio (filtrado local): %s", cliente_id)
+        
+        total_productos = len(productos)
+        self.logger.info("Total de productos recuperados: %d", total_productos)
+        
+        # Verificamos si hay productos con algún campo relacionado a clientes
+        if productos and total_productos > 0:
+            producto_ejemplo = productos[0]
+            self.logger.info("Campos disponibles en producto ejemplo: %s", 
+                             ', '.join([k for k in vars(producto_ejemplo).keys()]))
+
+        # Intentar filtrar por múltiples campos y variaciones de nombre
+        campos_posibles = [
+            "usrcode", "usrCode", "cliente_id", "clienteid", "clienteId", "cliente", 
+            "id_cliente", "idCliente"
+        ]
+        
+        resultado_filtrados = []
+        
+        for campo in campos_posibles:
+            # Intentar filtrado por el campo exacto
+            filtrados = [p for p in productos if hasattr(p, campo) and 
+                        str(getattr(p, campo, "")).lower() == str(cliente_id).lower()]
+            
+            if filtrados:
+                self.logger.info("Productos filtrados por %s=%s: %d encontrados", 
+                               campo, cliente_id, len(filtrados))
+                resultado_filtrados.extend(filtrados)
+        
+        # Eliminar duplicados en caso de que se hayan encontrado productos en múltiples campos
+        resultado_filtrados = list({p.productoid: p for p in resultado_filtrados}.values())
+        
+        if not resultado_filtrados:
+            self.logger.warning("No se encontraron productos para cliente_id=%s en ninguno de los campos probados: %s", 
+                             cliente_id, ', '.join(campos_posibles))
+        else:
+            self.logger.info("Total de productos filtrados para cliente_id=%s: %d", 
+                           cliente_id, len(resultado_filtrados))
+        
+        return resultado_filtrados
+    
     def __init__(self, cfg: dict, client_logger):
         self.cfg = cfg
         self.logger = client_logger
 
     def _token_endpoint(self) -> str:
-        self.logger.debug("Entrando a _token_endpoint con cfg: %s", self.cfg)
         if not self.cfg.get("XUBIO_BASE_URL"):
             self.logger.warning("No se encontró XUBIO_BASE_URL en la configuración")
         if self.cfg.get("XUBIO_TOKEN_URL"):
@@ -42,7 +86,6 @@ class XubioClient(ClienteGateway, TokenGateway, ProductoVentaGateway):
 
     def build_url(self, path: str) -> str:
         "Construye una URL completa para la API de Xubio dado un path"
-        self.logger.debug("Construyendo URL con base: %s y path: %s", self.cfg.get("XUBIO_BASE_URL"), path)
         if not path:
             self.logger.warning("El path para construir la URL está vacío")
         base = self.cfg["XUBIO_BASE_URL"].rstrip("/")
@@ -56,7 +99,6 @@ class XubioClient(ClienteGateway, TokenGateway, ProductoVentaGateway):
         self.logger.info("Obteniendo access token de Xubio")
         token_url = self._token_endpoint()
         try:
-            self.logger.debug("Realizando POST a %s", token_url)
             resp = requests.post(
                 token_url,
                 data={
@@ -74,7 +116,6 @@ class XubioClient(ClienteGateway, TokenGateway, ProductoVentaGateway):
                 self.logger.error("Xubio token error %s: %s", resp.status_code, resp.text)
                 raise HTTPException(status_code=resp.status_code, detail="Error al obtener token de Xubio")
             data = resp.json()
-            self.logger.debug("Datos de token recibidos: %s", data)
             if "access_token" not in data:
                 self.logger.error("Respuesta de token inesperada: %s", data)
                 self.logger.critical("No se encontró 'access_token' en la respuesta de Xubio")
@@ -123,7 +164,9 @@ class XubioClient(ClienteGateway, TokenGateway, ProductoVentaGateway):
         token_data = self.get_access_token()
         access_token = token_data["access_token"]
         path = self.cfg.get("XUBIO_CLIENTS_PATH", "/1.1/clienteBean")
+
         url = self.build_url(f"{path}/{cliente_id}")
+
         try:
             resp = requests.get(
                 url,
@@ -135,6 +178,7 @@ class XubioClient(ClienteGateway, TokenGateway, ProductoVentaGateway):
                 verify=self.cfg["XUBIO_VERIFY_TLS"],
             )
             self.logger.info("Respuesta de cliente por ID recibida: status %s", resp.status_code)
+
             if resp.status_code == 404:
                 self.logger.warning("Cliente no encontrado: %s", cliente_id)
                 raise HTTPException(status_code=404, detail="Cliente no encontrado")
@@ -142,6 +186,7 @@ class XubioClient(ClienteGateway, TokenGateway, ProductoVentaGateway):
                 self.logger.error("Error al obtener cliente %s: %s", resp.status_code, resp.text)
                 raise HTTPException(status_code=resp.status_code, detail="Error al obtener cliente de Xubio")
             data = resp.json()
+
             return Cliente.from_dict(data)
         except requests.RequestException as e:
             self.logger.exception("Fallo HTTP al obtener cliente de Xubio")
