@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>DataMaq Xubio Gateway</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">DataMaq Xubio Gateway</a>
+        </div>
+    </nav>
+    <div class="container">
+        <ul class="nav nav-tabs" id="mainTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active tab" id="clientes-tab" data-tab="clientes" type="button" role="tab">Clientes</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link tab" id="productos-tab" data-tab="productos" type="button" role="tab">Producto ventas</button>
+            </li>
+            <li class="nav-item ms-auto" role="presentation">
+                <button class="nav-link tab" id="token-tab" data-tab="token" type="button" role="tab">Token test</button>
+            </li>
+        </ul>
+        <div class="tab-content mt-4">
+            <div id="tab-clientes" class="tab-pane fade show active tab-content-custom">
+                <h2>Clientes</h2>
+                <p>Consulta y gestiona los clientes de Xubio.</p>
+                <div id="clientes-table-container"></div>
+            </div>
+            <div id="tab-productos" class="tab-pane fade tab-content-custom">
+                <h2>Producto ventas</h2>
+                <p>Consulta los productos en venta registrados en Xubio.</p>
+            </div>
+            <div id="tab-token" class="tab-pane fade tab-content-custom">
+                <h2>Token test</h2>
+                <p>Prueba la obtención de token OAuth2 desde Xubio.</p>
+            </div>
+        </div>
+    </div>
+    <!-- Bootstrap JS (opcional, para componentes interactivos) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Tu JS personalizado -->
+    <script src="main.js"></script>
+</body>
+</html>

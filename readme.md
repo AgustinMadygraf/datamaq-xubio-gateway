@@ -17,10 +17,12 @@ Gateway FastAPI para interactuar con la API de Xubio usando OAuth2 client creden
 2. Crea un entorno virtual y actívalo:
    ```sh
    python -m venv venv
+   Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
    venv\Scripts\activate  # En Windows
    ```
 3. Instala dependencias:
    ```sh
+   python.exe -m pip install --upgrade pip
    pip install -r requirements.txt
    ```
 4. Copia `.env.example` a `.env` y completa tus credenciales Xubio.
