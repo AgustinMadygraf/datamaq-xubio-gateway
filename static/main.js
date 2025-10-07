@@ -49,12 +49,13 @@ const tabs = new TabsController({
       console.log("[LOG] Cargando productos venta...");
       productosVentaController.cargarListado();
     }
+    // No cargar nada en "inicio"
   }
 });
 
 tabs.init();
 
-// Carga inicial si Clientes ya está activo
+// Carga inicial solo si Clientes ya está activo
 if (view.isClientesActive()) {
   console.log("[LOG] Tab clientes activo al cargar la página.");
   clientesController.cargarListado();

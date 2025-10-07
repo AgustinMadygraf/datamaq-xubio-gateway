@@ -15,7 +15,10 @@
     <div class="container">
         <ul class="nav nav-tabs" id="mainTabs" role="tablist">
             <li class="nav-item" role="presentation">
-                <button class="nav-link active tab" id="clientes-tab" data-tab="clientes" type="button" role="tab">Clientes</button>
+                <button class="nav-link active tab" id="inicio-tab" data-tab="inicio" type="button" role="tab">Inicio</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link tab" id="clientes-tab" data-tab="clientes" type="button" role="tab">Clientes</button>
             </li>
             <li class="nav-item" role="presentation">
                 <button class="nav-link tab" id="productos-tab" data-tab="productos" type="button" role="tab">Producto ventas</button>
@@ -25,7 +28,17 @@
             </li>
         </ul>
         <div class="tab-content mt-4">
-            <div id="tab-clientes" class="tab-pane fade show active tab-content-custom">
+            <div id="tab-inicio" class="tab-pane fade show active tab-content-custom">
+                <h2>Bienvenido a DataMaq Xubio Gateway</h2>
+                <p>Este proyecto es un gateway FastAPI para la API de Xubio, usando OAuth2 con credenciales de cliente.</p>
+                <ul>
+                    <li>Consulta y gestiona clientes y productos de Xubio.</li>
+                    <li>Obtén tokens OAuth2 y prueba la integración.</li>
+                    <li>Clean Architecture para fácil mantenimiento y extensión.</li>
+                </ul>
+                <p>Para comenzar, selecciona una pestaña en la barra superior.</p>
+            </div>
+            <div id="tab-clientes" class="tab-pane fade tab-content-custom">
                 <h2>Clientes</h2>
                 <p>Consulta y gestiona los clientes de Xubio.</p>
                 <div id="clientes-table-container"></div>

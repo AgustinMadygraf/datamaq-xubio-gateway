@@ -4,6 +4,7 @@ export class TabsController {
     this.onTabChange = onTabChange;
     this.$tabs = document.querySelectorAll(".tab");
     this.$contents = {
+      inicio: document.getElementById("tab-inicio"),
       clientes: document.getElementById("tab-clientes"),
       productos: document.getElementById("tab-productos"),
       token: document.getElementById("tab-token"),
