@@ -27,17 +27,17 @@ class XubioClient(ClienteGateway, TokenGateway, ProductoVentaGateway):
         if filtrados:
             self.logger.info("Producto encontrado por productoid=%s", cliente_id)
             return filtrados
-        
+
         # Si llegamos aquí, el endpoint directo no funcionó, continuamos con el método actual
         self.logger.info("Listando productos de venta por cliente_id desde Xubio (filtrado local): %s", cliente_id)
-        
+
         total_productos = len(productos)
         self.logger.info("Total de productos recuperados: %d", total_productos)
-        
+
         # Verificamos si hay productos con algún campo relacionado a clientes
         if productos and total_productos > 0:
             producto_ejemplo = productos[0]
-            self.logger.info("Campos disponibles en producto ejemplo: %s", 
+            self.logger.info("Campos disponibles en producto ejemplo: %s",
                              ', '.join([k for k in vars(producto_ejemplo).keys()]))
 
         # Intentar filtrar por múltiples campos y variaciones de nombre
@@ -45,31 +45,31 @@ class XubioClient(ClienteGateway, TokenGateway, ProductoVentaGateway):
             "usrcode", "usrCode", "cliente_id", "clienteid", "clienteId", "cliente", 
             "id_cliente", "idCliente"
         ]
-        
+
         resultado_filtrados = []
-        
+
         for campo in campos_posibles:
             # Intentar filtrado por el campo exacto
-            filtrados = [p for p in productos if hasattr(p, campo) and 
+            filtrados = [p for p in productos if hasattr(p, campo) and
                         str(getattr(p, campo, "")).lower() == str(cliente_id).lower()]
-            
+
             if filtrados:
-                self.logger.info("Productos filtrados por %s=%s: %d encontrados", 
+                self.logger.info("Productos filtrados por %s=%s: %d encontrados",
                                campo, cliente_id, len(filtrados))
                 resultado_filtrados.extend(filtrados)
-        
+
         # Eliminar duplicados en caso de que se hayan encontrado productos en múltiples campos
         resultado_filtrados = list({p.productoid: p for p in resultado_filtrados}.values())
-        
+
         if not resultado_filtrados:
-            self.logger.warning("No se encontraron productos para cliente_id=%s en ninguno de los campos probados: %s", 
+            self.logger.warning("No se encontraron productos para cliente_id=%s en ninguno de los campos probados: %s",
                              cliente_id, ', '.join(campos_posibles))
         else:
-            self.logger.info("Total de productos filtrados para cliente_id=%s: %d", 
+            self.logger.info("Total de productos filtrados para cliente_id=%s: %d",
                            cliente_id, len(resultado_filtrados))
-        
+
         return resultado_filtrados
-    
+
     def __init__(self, cfg: dict, client_logger):
         self.cfg = cfg
         self.logger = client_logger
@@ -136,13 +136,15 @@ class XubioClient(ClienteGateway, TokenGateway, ProductoVentaGateway):
         params = {}
         if updated_since:
             params["updated_since"] = updated_since
+        headers = {
+            "Authorization": f"Bearer {access_token}",
+            "Accept": "application/json",
+        }
+
         try:
             resp = requests.get(
                 url,
-                headers={
-                    "Authorization": f"Bearer {access_token}",
-                    "Accept": "application/json",
-                },
+                headers=headers,
                 params=params,
                 timeout=self.cfg["XUBIO_TIMEOUT_S"],
                 verify=self.cfg["XUBIO_VERIFY_TLS"],
@@ -150,12 +152,13 @@ class XubioClient(ClienteGateway, TokenGateway, ProductoVentaGateway):
             self.logger.info("Respuesta de clientes recibida: status %s", resp.status_code)
             if resp.status_code >= 400:
                 self.logger.error("Error al listar clientes %s: %s", resp.status_code, resp.text)
-                raise HTTPException(status_code=resp.status_code, detail="Error al listar clientes de Xubio")
+                raise HTTPException(status_code=resp.status_code, detail=f"Error al listar clientes de Xubio: {resp.text}")
             data = resp.json()
             items = data.get("items") if isinstance(data, dict) and "items" in data else data
             return [Cliente.from_dict(item) for item in items]
         except requests.RequestException as e:
             self.logger.exception("Fallo HTTP al listar clientes de Xubio")
+            self.logger.critical("Excepción crítica al listar clientes: %s", e)
             raise HTTPException(status_code=502, detail=f"Fallo HTTP listar clientes Xubio: {e}") from e
 
     def get_cliente_by_id(self, cliente_id: str):
