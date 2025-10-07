@@ -34,20 +34,12 @@ export class ClientesView {
     if (!rows?.length) return this.showInfo("No hay clientes para mostrar.");
     const head = `
       <thead><tr>
-        <th>ID</th><th>Nombre</th><th>Razón Social</th><th>Email</th>
-        <th>Teléfono</th><th>CUIT</th><th>Provincia</th><th>Dirección</th><th>Actualizado</th>
+        <th>ID</th><th>Nombre</th>
       </tr></thead>`;
     const body = rows.map(r => `
       <tr>
         <td><a href="#" class="cliente-id-link text-primary text-decoration-underline" data-id="${r.id}">${r.id}</a></td>
         <td>${r.nombre}</td>
-        <td>${r.razonSocial}</td>
-        <td>${r.email}</td>
-        <td>${r.telefono}</td>
-        <td>${r.cuit}</td>
-        <td>${r.provincia}</td>
-        <td>${r.direccion}</td>
-        <td>${r.actualizado}</td>
       </tr>
     `).join("");
 
