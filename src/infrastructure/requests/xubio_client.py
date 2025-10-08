@@ -9,7 +9,7 @@ from fastapi import HTTPException
 
 
 from src.interface_adapter.gateways.xubio_gateway import XubioGateway
-from src.entities.cliente_bean_entitie import ClienteGateway, Cliente
+from src.entities.cliente_bean_entitie import Cliente,ClienteGateway
 from src.entities.token_gateway import TokenGateway
 from src.entities.producto_venta_entitie import ProductoVenta, ProductoVentaGateway
 

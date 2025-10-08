@@ -9,10 +9,10 @@ from fastapi import APIRouter, Query
 from src.shared.config import get_config
 from src.shared.logger import get_logger
 
+from src.infrastructure.requests.xubio_client import XubioClient
 from src.infrastructure.requests.xubio_client import SimpleXubioGateway
 from src.interface_adapter.controllers.cliente_bean_controller import ClienteBeanController
 from src.interface_adapter.controllers.obtener_token_controller import ObtenerTokenController
-from src.infrastructure.requests.xubio_client import XubioClient
 from src.interface_adapter.controllers.producto_venta_controller import ProductoVentaController
 
 router = APIRouter(prefix="", tags=["xubio"])
