@@ -60,3 +60,28 @@ if (view.isClientesActive()) {
   console.log("[LOG] Tab clientes activo al cargar la página.");
   clientesController.cargarListado();
 }
+
+
+document.addEventListener("DOMContentLoaded", () => {
+  const clientesTab = document.getElementById("clientes-tab");
+  const container = document.getElementById("clientes-table-container");
+
+  clientesTab.addEventListener("click", async () => {
+      if (!container.innerHTML.trim()) {
+          try {
+              const response = await fetch("/clientes");
+              if (response.ok) {
+                  const html = await response.text();
+                  // Extraemos solo la tabla (suponiendo que tu template clientes.html tiene <table>...</table>)
+                  const tableMatch = html.match(/<table[\s\S]*<\/table>/i);
+                  container.innerHTML = tableMatch ? tableMatch[0] : "<p>No hay datos</p>";
+              } else {
+                  container.innerHTML = "<p>Error al cargar clientes.</p>";
+              }
+          } catch (err) {
+              console.error(err);
+              container.innerHTML = "<p>Error al cargar clientes.</p>";
+          }
+      }
+  });
+});
