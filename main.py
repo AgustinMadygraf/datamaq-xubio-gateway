@@ -6,10 +6,11 @@ Arranque del servicio con chequeos y logger
 import os
 import sys
 import uvicorn
+import mysql.connector
 from database import get_connection
 from src.shared.config import get_config, require_config
 from src.shared.logger import get_logger
-from src.main import app
+# from src.main import app
 
 log = get_logger("datamaq-run")
 
@@ -32,7 +33,6 @@ if __name__ == "__main__":
     host = os.getenv("APP_HOST", "0.0.0.0")
     port = int(os.getenv("APP_PORT", "5000"))
     log.info("Iniciando DataMaq Gateway en http://%s:%s", host, port)
-    # Levanta la app definida en static_server.py
     uvicorn.run(
         "src.infrastructure.fastapi.static_server:app",
         host=host,
@@ -40,8 +40,13 @@ if __name__ == "__main__":
         reload=os.getenv("UVICORN_RELOAD", "true").lower() == "true"
     )
 
-
-conn = get_connection()
-cursor = conn.cursor()
-cursor.execute("SELECT DATABASE();")
-print("Conectado a:", cursor.fetchone())
+try:
+    conn = get_connection()
+    if conn is None:
+        log.error("No se pudo conectar a MySQL: get_connection() devolvió None")
+    else:
+        cursor = conn.cursor()
+        cursor.execute("SELECT DATABASE();")
+        print("Conectado a:", cursor.fetchone())
+except mysql.connector.Error as e:
+    log.error("Error al conectar a MySQL: %s", str(e))
